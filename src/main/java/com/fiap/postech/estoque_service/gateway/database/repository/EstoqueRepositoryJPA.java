@@ -9,7 +9,10 @@ import java.util.Optional;
 @Repository
 public interface EstoqueRepositoryJPA extends JpaRepository<EstoqueEntity, Integer> {
 
-    boolean existsByIdProduto(Integer idProduto);
 
     Optional<EstoqueEntity> findByIdProduto(Integer idProduto);
+
+    Optional<EstoqueEntity> findBySkuProduto(String skuProduto);
+
+    void deleteBySkuProduto(String skuProduto);
 }

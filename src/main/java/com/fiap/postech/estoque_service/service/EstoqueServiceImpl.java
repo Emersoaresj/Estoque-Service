@@ -15,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @Service
 public class EstoqueServiceImpl implements EstoqueServicePort {
@@ -28,17 +30,17 @@ public class EstoqueServiceImpl implements EstoqueServicePort {
     @Override
     public ResponseDto cadastrarEstoque(EstoqueRequest request) {
         try {
-            Estoque estoque = EstoqueMapper.INSTANCE.requestToDomain(request);
+            if (repositoryPort.buscarPorSku(request.getSkuProduto()) != null) {
+                log.warn("Estoque já cadastrado para o SKU: {}", request.getSkuProduto());
+                throw new EstoqueExistsException("Estoque já cadastrado para o SKU: " + request.getSkuProduto());
+            }
 
+            Estoque estoque = EstoqueMapper.INSTANCE.requestToDomain(request);
             validaCriacaoEstoque(estoque);
 
             ProdutoDto produto = chamadaProdutoClient(estoque);
             estoque.setIdProduto(produto.getIdProduto());
 
-            if (repositoryPort.existeEstoquePorIdProduto(estoque.getIdProduto())) {
-                log.warn("Estoque já cadastrado para o SKU: {}", estoque.getSkuProduto());
-                throw new EstoqueExistsException(ConstantUtils.ESTOQUE_JA_EXISTE);
-            }
             return repositoryPort.cadastrarEstoque(estoque);
 
         } catch (InvalidQuantidadeEstoqueException | InvalidSkuEstoqueException |
@@ -51,15 +53,11 @@ public class EstoqueServiceImpl implements EstoqueServicePort {
     }
 
     @Override
-    public ResponseDto atualizarEstoque(AtualizaEstoqueRequest request) {
+    public ResponseDto atualizarEstoque(String sku, Integer novaQuantidade) {
         try {
-            if (!repositoryPort.existeEstoquePorIdProduto(request.getIdProduto())) {
-                log.warn("Estoque não encontrado para o ID do produto: {}", request.getIdProduto());
-                throw new EstoqueNotFoundException(ConstantUtils.ESTOQUE_NAO_ENCONTRADO);
-            }
+            Estoque estoque = repositoryPort.buscarPorSku(sku);
+            estoque.setQuantidadeEstoque(novaQuantidade);
 
-            Estoque estoque = repositoryPort.buscarPorIdProduto(request.getIdProduto());
-            estoque.setQuantidadeEstoque(request.getNovaQuantidade());
             return repositoryPort.atualizarEstoque(estoque);
 
         } catch (EstoqueNotFoundException e) {
@@ -101,6 +99,42 @@ public class EstoqueServiceImpl implements EstoqueServicePort {
             repositoryPort.atualizarEstoque(estoque);
         }
         return new BaixaEstoqueResponse(true, "Estoque restaurado com sucesso");
+    }
+
+    @Override
+    public EstoqueDto buscarPorSku(String skuProduto) {
+        try {
+            Estoque estoque = repositoryPort.buscarPorSku(skuProduto);
+            return EstoqueMapper.INSTANCE.domainToDto(estoque);
+        } catch (EstoqueNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Erro inesperado ao buscar estoque por SKU", e);
+            throw new ErroInternoException("Erro interno ao tentar buscar estoque: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public List<EstoqueDto> listarTodos() {
+        try {
+            return repositoryPort.listarTodos();
+        } catch (Exception e) {
+            log.error("Erro inesperado ao buscar estoques", e);
+            throw new ErroInternoException("Erro interno ao tentar buscar estoques: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void deletarEstoque(String skuProduto) {
+        try {
+            repositoryPort.deletarEstoque(skuProduto);
+        } catch (EstoqueNotFoundException e) {
+            log.error("Estoque não encontrado para o SKU: {}", skuProduto, e);
+            throw e;
+        } catch (Exception e) {
+            log.error("Erro inesperado ao buscar estoque por SKU: {}", skuProduto, e);
+            throw new ErroInternoException("Erro interno ao tentar buscar produto: " + e.getMessage());
+        }
     }
 
     private boolean validaEstoque(Integer idProduto, Integer quantidade) {

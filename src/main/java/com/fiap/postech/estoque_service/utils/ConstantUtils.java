@@ -16,7 +16,7 @@ public class ConstantUtils {
     //ERROS
     public static final String PRODUTO_NAO_ENCONTRADO = "Produto não encontrado para o SKU informado.";
     public static final String ESTOQUE_JA_EXISTE = "Já existe estoque cadastrado para o SKU informado.";
-    public static final String ESTOQUE_NAO_ENCONTRADO = "Estoque não encontrado.";
+    public static final String ESTOQUE_NAO_ENCONTRADO = "Estoque não encontrado para o produto informado.";
 
 
     //SUCESSO

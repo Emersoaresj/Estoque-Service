@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 public class ProdutoDto {
 
     private Integer idProduto;
+    private String nomeProduto;
     private String skuProduto;
     private BigDecimal precoProduto;
 }
