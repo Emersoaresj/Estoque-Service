@@ -98,6 +98,16 @@ public class EstoqueRepositoryImpl implements EstoqueRepositoryPort {
         estoqueRepositoryJPA.deleteBySkuProduto(skuProduto);
     }
 
+    @Override
+    public boolean estoqueExistsBySku(String skuProduto) {
+        try {
+            return estoqueRepositoryJPA.existsBySkuProduto(skuProduto);
+        } catch (Exception e) {
+            log.error("Erro ao verificar se o estoque existe para o SKU: {}", skuProduto, e);
+            throw new ErroInternoException("Erro ao verificar estoque: " + e.getMessage());
+        }
+    }
+
     private ResponseDto montaResponse(EstoqueEntity estoqueEntity, String tipoAcao) {
         ResponseDto response = new ResponseDto();
 

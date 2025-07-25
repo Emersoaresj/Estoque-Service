@@ -15,4 +15,6 @@ public interface EstoqueRepositoryJPA extends JpaRepository<EstoqueEntity, Integ
     Optional<EstoqueEntity> findBySkuProduto(String skuProduto);
 
     void deleteBySkuProduto(String skuProduto);
+
+    boolean existsBySkuProduto(String skuProduto);
 }

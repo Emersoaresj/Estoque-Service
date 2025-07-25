@@ -20,4 +20,6 @@ public interface EstoqueRepositoryPort {
 
     void deletarEstoque(String skuProduto);
 
+    boolean estoqueExistsBySku(String skuProduto);
+
 }

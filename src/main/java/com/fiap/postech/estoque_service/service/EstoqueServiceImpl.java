@@ -30,7 +30,7 @@ public class EstoqueServiceImpl implements EstoqueServicePort {
     @Override
     public ResponseDto cadastrarEstoque(EstoqueRequest request) {
         try {
-            if (repositoryPort.buscarPorSku(request.getSkuProduto()) != null) {
+            if (repositoryPort.estoqueExistsBySku(request.getSkuProduto())) {
                 log.warn("Estoque já cadastrado para o SKU: {}", request.getSkuProduto());
                 throw new EstoqueExistsException("Estoque já cadastrado para o SKU: " + request.getSkuProduto());
             }
