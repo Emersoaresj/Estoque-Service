@@ -1,6 +1,6 @@
 # Estoque Service
 
-Serviço Java baseado em Spring Boot para gerenciamento de estoque, utilizando PostgreSQL, Flyway para migrações e arquitetura hexagonal (Ports & Adapters).
+Serviço Java baseado em Spring Boot para gerenciamento de estoque, utilizando PostgreSQL, FeignClient para comunicação entre APIs, Flyway para migrações e arquitetura hexagonal (Ports & Adapters).
 
 ---
 
