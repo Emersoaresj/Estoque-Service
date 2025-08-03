@@ -71,12 +71,19 @@ class EstoqueServiceImplTest {
 
     @Test
     void cadastrarEstoque_deveLancarEstoqueExistsException() {
+        // Arrange
         EstoqueRequest request = new EstoqueRequest();
         request.setSkuProduto("AP-IPH-001");
+        request.setQuantidadeEstoque(1);
 
-        when(repositoryPort.buscarPorSku("AP-IPH-001")).thenReturn(new Estoque());
+        // Mockando que o estoque já existe para o SKU
+        when(repositoryPort.estoqueExistsBySku("AP-IPH-001")).thenReturn(true);
 
+        // Act & Assert
         assertThrows(EstoqueExistsException.class, () -> service.cadastrarEstoque(request));
+
+        // Optional: você pode verificar que o método de client não foi chamado:
+        verify(produtoClient, never()).buscarPorSku(anyString());
     }
 
     @Test
